@@ -1,3 +1,8 @@
+"""
+	compute_bin_averages(O::Array{Float64, 1}, n::Int)
+
+Computes the bin averages, used in computing the autocorrelation time.
+"""
 function compute_bin_averages(O::Array{Float64, 1}, n::Int)
 	N = length(O)
 	N_B = Int(floor(N / n))
@@ -13,6 +18,13 @@ function compute_bin_averages(O::Array{Float64, 1}, n::Int)
 end
 
 
+"""
+	compute_autocorrelation_time(model::AbstractMagnetismModel, ns::Array{Int, 1})
+
+Computes the integrated autocorrelation time using the binning method. The autocorrelation
+time is the value at which the output sequence (either energy `:e` or magnetization `:m` in
+the return dictionary) asymptotes at.
+"""
 function compute_autocorrelation_time(model::AbstractMagnetismModel, ns::Array{Int, 1})
 	e       = model.observables.E ./ length(model.σ)
 	m       = abs.(model.observables.M) ./ length(model.σ)
@@ -32,5 +44,5 @@ function compute_autocorrelation_time(model::AbstractMagnetismModel, ns::Array{I
 		push!(τ_int_m, ε²_m * N / 2σ²_m)
 	end
 
-	return Dict("e" => τ_int_e, "m" => τ_int_m)
+	return Dict(:e => τ_int_e, :m => τ_int_m)
 end
