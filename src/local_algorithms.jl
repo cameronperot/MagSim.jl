@@ -1,47 +1,67 @@
 """
-	metropolis!(I::Ising_2D)
+	metropolis!(model::Ising)
 
-Implementation of the famous Metropolis local update algorithm.
+Implementation of the famous Metropolis local update algorithm for the Ising model.
 """
-function metropolis!(I::Ising_2D)
-	t₀   = floor(Int, I.params.cutoff * I.params.n_sweeps)
+function metropolis!(model::Ising)
+	t₀   = floor(Int, model.params.cutoff * model.params.n_sweeps)
 	ΔEs  = [-8, -4, 0, 4, 8]
-	exps = exp(-I.params.β) .^ ΔEs
+	exps = exp(-model.params.β) .^ ΔEs
 
-	for t in 1:I.params.n_sweeps
-		for j in 1:I.params.L
-			for i in 1:I.params.L
-				k = Int(I.σ[i, j] * sum_of_neighbors(I, i, j) / 2 + 3)
+	for t in 1:model.params.n_sweeps
+		for j in 1:model.params.L, i in 1:model.params.L
+			k = Int(model.σ[i, j] * sum_of_neighbors(model, i, j) / 2 + 3)
 
-				if ΔEs[k] <= 0 || exps[k] > rand(I.rng)
-					I.σ[i, j] *= -1
-					I.observables.E_current += ΔEs[k]
-					I.observables.M_current += 2 * I.σ[i, j]
-				end
+			if ΔEs[k] <= 0 || rand(model.rng) < exps[k]
+				model.σ[i, j] *= -1
+				model.observables.E_current += ΔEs[k]
+				model.observables.M_current += 2 * model.σ[i, j]
 			end
 		end
 
-		t > t₀ && update_observables!(I, t)
+		t > t₀ && update_observables!(model, t)
 	end
 
-	compute_observables_statistics!(I)
-	return I
+	compute_observables_statistics!(model)
+	return model
 end
 
 
 """
-	metropolis!(model::Potts_2D)
+	metropolis!(model::Potts)
 
+Implementation of the famous Metropolis local update algorithm for the Potts model.
 """
-function metropolis!(model::Potts_2D)
+function metropolis!(model::Potts)
+	t₀   = floor(Int, model.params.cutoff * model.params.n_sweeps)
+	expᵦ = exp(-model.params.β)
+
+	for t in 1:model.params.n_sweeps
+		for j in 1:model.params.L, i in 1:model.params.L
+			counts   = compute_counts(model, i, j)
+			old_spin = model.σ[i, j]
+			new_spin = rand(model.rng, UnitRange{Int8}(1, model.params.q))
+			ΔE       = counts[old_spin] - counts[new_spin]
+
+			if ΔE <= 0 || rand(model.rng) < expᵦ^ΔE
+				model.σ[i, j] = new_spin
+				model.observables.E_current += ΔE
+			end
+		end
+
+		t > t₀ && update_observables!(model, t)
+	end
+
+	compute_observables_statistics!(model)
+	return model
 end
 
 
 """
-	metropolis!(model::XY_2D)
+	metropolis!(model::XY)
 
 """
-function metropolis!(model::XY_2D)
+function metropolis!(model::XY)
 end
 
 
@@ -70,15 +90,31 @@ end
 
 
 """
-	sum_of_neighbors(I::Ising_2D, i::Int, j::Int)
+	sum_of_neighbors(model::Ising, i::Int, j::Int)
 
 Sums the values of the neighbors for a given site (i, j).
 """
-function sum_of_neighbors(I::Ising_2D, i::Int, j::Int)
+function sum_of_neighbors(model::Ising, i::Int, j::Int)
 	return (
-		I.σ[plus(i, I.params.L), j] +
-		I.σ[minus(i, I.params.L), j] +
-		I.σ[i, plus(j, I.params.L)] +
-		I.σ[i, minus(j, I.params.L)]
+		model.σ[plus(i, model.params.L), j] +
+		model.σ[minus(i, model.params.L), j] +
+		model.σ[i, plus(j, model.params.L)] +
+		model.σ[i, minus(j, model.params.L)]
 		)
+end
+
+
+"""
+	compute_counts(q::Int, σ::Array{Int8, 1}, i::Int, j::Int)
+
+"""
+function compute_counts(model::Potts, i::Int, j::Int)
+	counts = zeros(Int8, model.params.q)
+
+	counts[model.σ[plus(i, model.params.L), j]]  += 1
+	counts[model.σ[minus(i, model.params.L), j]] += 1
+	counts[model.σ[i, plus(j, model.params.L)]]  += 1
+	counts[model.σ[i, minus(j, model.params.L)]] += 1
+
+	return counts
 end

@@ -1,46 +1,46 @@
 """
-	wolff!(model::Ising_2D)
+	wolff!(model::Ising)
 
 """
-function wolff!(model::Ising_2D)
+function wolff!(model::Ising)
 end
 
 
 """
-	wolff!(model::Potts_2D)
+	wolff!(model::Potts)
 
 """
-function wolff!(model::Potts_2D)
+function wolff!(model::Potts)
 end
 
 
 """
-	wolff!(model::XY_2D)
+	wolff!(model::XY)
 
 """
-function wolff!(model::XY_2D)
+function wolff!(model::XY)
 end
 
 
 """
-	swendsen_wang!(model::Ising_2D)
+	swendsen_wang!(model::Ising)
 
 """
-function swendsen_wang!(model::Ising_2D)
+function swendsen_wang!(model::Ising)
 end
 
 
 """
-	swendsen_wang!(model::Potts_2D)
+	swendsen_wang!(model::Potts)
 
 """
-function swendsen_wang!(model::Potts_2D)
+function swendsen_wang!(model::Potts)
 end
 
 
 """
-	swendsen_wang!(model::XY_2D)
+	swendsen_wang!(model::XY)
 
 """
-function swendsen_wang!(model::XY_2D)
+function swendsen_wang!(model::XY)
 end

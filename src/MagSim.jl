@@ -11,9 +11,9 @@ export
 
 # AbstractModels
 MagnetismModels,
-Ising_2D,
-Potts_2D,
-XY_2D,
+Ising,
+Potts,
+XY,
 
 # cluster_algorithms
 wolff!,
@@ -31,7 +31,7 @@ plot_energy,
 plot_heat_capacity,
 plot_magnetization,
 plot_susceptibility,
-plot_2D_Ising_lattice
+plot_Ising_lattice
 
 # includes
 include("./MagnetismModels.jl")

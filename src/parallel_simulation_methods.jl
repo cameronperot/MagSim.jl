@@ -2,7 +2,7 @@
 	simulate_βs_and_Ls(model::AbstractMagnetismModel, βs, Ls)
 
 """
-function simulate_Ising_2D_parallel(
+function simulate_Ising_parallel(
 	algorithm ::Function,
 	Ls        ::Array{Int, 1},
 	βs        ::Array{Float64, 1};
@@ -12,12 +12,12 @@ function simulate_Ising_2D_parallel(
 	seed      ::Int     =8,
 	)
 
-	out = Dict{Tuple, Ising_2D}()
+	out = Dict{Tuple, Ising}()
 	Threads.@threads for β in βs
 		Threads.@threads for L in Ls
 			out[(L, β)] =
 				algorithm(
-					Ising_2D(
+					Ising(
 						L, β,
 						n_sweeps=n_sweeps, cutoff=cutoff, start_type=start_type, seed=seed
 						)

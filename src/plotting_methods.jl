@@ -31,8 +31,8 @@ end
 
 
 """
-	plot_2D_Ising_lattice(model::Ising_2D)
+	plot_2D_Ising_lattice(model::Ising)
 
 """
-function plot_2D_Ising_lattice(model::Ising_2D)
+function plot_Ising_lattice(model::Ising)
 end
