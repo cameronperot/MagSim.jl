@@ -66,26 +66,75 @@ end
 
 
 """
-	heat_bath!(model::Ising_2D)
+	heat_bath!(model::Ising)
 
+Implementation of the heat bath algorithm for the Ising model.
 """
-function heat_bath!(model::Ising_2D)
+function heat_bath!(model::Ising)
+	t₀   = floor(Int, model.params.cutoff * model.params.n_sweeps)
+	ΔEs  = [-8, -4, 0, 4, 8]
+	exps = exp(-model.params.β) .^ ΔEs
+
+	for t in 1:model.params.n_sweeps
+		for j in 1:model.params.L, i in 1:model.params.L
+			k = Int(model.σ[i, j] * sum_of_neighbors(model, i, j) / 2 + 3)
+			P = exps[k] / (exps[k] + 1)
+
+			if rand(model.rng) < P
+				model.σ[i, j] *= -1
+				model.observables.E_current += ΔEs[k]
+				model.observables.M_current += 2 * model.σ[i, j]
+			end
+		end
+
+		t > t₀ && update_observables!(model, t)
+	end
+
+	compute_observables_statistics!(model)
+	return model
 end
 
 
 """
-	heat_bath!(model::Potts_2D)
+	heat_bath!(model::Potts)
 
+Implementation of the heat bath algorithm for the Potts model.
 """
-function heat_bath!(model::Potts_2D)
+function heat_bath!(model::Potts)
+	t₀   = floor(Int, model.params.cutoff * model.params.n_sweeps)
+	exps = exp.(model.params.β .* collect(0:4))
+
+	for t in 1:model.params.n_sweeps
+		for j in 1:model.params.L, i in 1:model.params.L
+			counts   = compute_counts(model, i, j)
+			old_spin = model.σ[i, j]
+			ps       = exp.(model.params.β .* counts); ps ./= sum(ps)
+			R        = rand(model.rng)
+			P        = 0.0
+
+			for (new_spin, p) in enumerate(ps)
+				P += p
+				if R < P
+					model.σ[i, j] = new_spin
+					model.observables.E_current += counts[old_spin] - counts[new_spin]
+					break
+				end
+			end
+		end
+
+		t > t₀ && update_observables!(model, t)
+	end
+
+	compute_observables_statistics!(model)
+	return model
 end
 
 
 """
-	heat_bath!(model::XY_2D)
+	heat_bath!(model::XY)
 
 """
-function heat_bath!(model::XY_2D)
+function heat_bath!(model::XY)
 end
 
 
