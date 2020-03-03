@@ -12,11 +12,7 @@ function metropolis!(model::Ising)
 		for j in 1:model.params.L, i in 1:model.params.L
 			k = Int(model.σ[i, j] * sum_of_neighbors(model, i, j) / 2 + 3)
 
-			if ΔEs[k] <= 0 || rand(model.rng) < exps[k]
-				model.σ[i, j] *= -1
-				model.observables.E_current += ΔEs[k]
-				model.observables.M_current += 2 * model.σ[i, j]
-			end
+			(ΔEs[k] <= 0 || rand(model.rng) < exps[k]) && (model.σ[i, j] *= -1)
 		end
 
 		t > t₀ && update_observables!(model)
@@ -43,10 +39,7 @@ function metropolis!(model::Potts)
 			new_spin = rand(model.rng, UnitRange{Int8}(1, model.params.q))
 			ΔE       = counts[old_spin] - counts[new_spin]
 
-			if ΔE <= 0 || rand(model.rng) < eᵝ^ΔE
-				model.σ[i, j] = new_spin
-				model.observables.E_current += ΔE
-			end
+			(ΔE <= 0 || rand(model.rng) < eᵝ^ΔE) && (model.σ[i, j] = new_spin)
 		end
 
 		t > t₀ && update_observables!(model)
@@ -72,12 +65,7 @@ function metropolis!(model::XY)
 			new_spin = random_XYVector(model.rng)
 			ΔE       = dot(old_spin .- new_spin, sum_of_neighbors(model, i, j))
 
-			if ΔE <= 0 || rand(model.rng) < eᵝ^ΔE
-				model.σ[i, j] = new_spin
-				model.observables.E_current  += ΔE
-				model.observables.Mx_current += new_spin[1] - old_spin[1]
-				model.observables.My_current += new_spin[2] - old_spin[2]
-			end
+			(ΔE <= 0 || rand(model.rng) < eᵝ^ΔE) && (model.σ[i, j] = new_spin)
 		end
 
 		t > t₀ && update_observables!(model)
@@ -102,11 +90,7 @@ function heat_bath!(model::Ising)
 		for j in 1:model.params.L, i in 1:model.params.L
 			k = Int(model.σ[i, j] * sum_of_neighbors(model, i, j) / 2 + 3)
 
-			if rand(model.rng) < exps[k] / (exps[k] + 1)
-				model.σ[i, j] *= -1
-				model.observables.E_current += ΔEs[k]
-				model.observables.M_current += 2 * model.σ[i, j]
-			end
+			(rand(model.rng) < exps[k] / (exps[k] + 1)) && (model.σ[i, j] *= -1)
 		end
 
 		t > t₀ && update_observables!(model)
@@ -136,11 +120,7 @@ function heat_bath!(model::Potts)
 
 			for (new_spin, p) in enumerate(ps)
 				P += p
-				if R < P
-					model.σ[i, j] = new_spin
-					model.observables.E_current += counts[old_spin] - counts[new_spin]
-					break
-				end
+				R < P && (model.σ[i, j] = new_spin; break)
 			end
 		end
 
@@ -167,12 +147,7 @@ function heat_bath!(model::XY)
 			new_spin = random_XYVector(model.rng)
 			ΔE       = dot(old_spin .- new_spin, sum_of_neighbors(model, i, j))
 
-			if rand(model.rng) < eᵝ^ΔE / (eᵝ^ΔE + 1)
-				model.σ[i, j] = new_spin
-				model.observables.E_current  += ΔE
-				model.observables.Mx_current += new_spin[1] - old_spin[1]
-				model.observables.My_current += new_spin[2] - old_spin[2]
-			end
+			(rand(model.rng) < eᵝ^ΔE / (eᵝ^ΔE + 1)) && (model.σ[i, j] = new_spin)
 		end
 
 		t > t₀ && update_observables!(model)
