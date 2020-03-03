@@ -79,9 +79,7 @@ struct Ising <: AbstractMagnetismModel
 		params                = Parameters(L, β, n_sweeps, cutoff, start_type, seed, 0)
 		rng                   = MersenneTwister(params.seed)
 		σ                     = initialize_σ_Ising(params.L, params.start_type, rng)
-		observables           = Observables()
-		observables.E_current = compute_E_Ising(σ)
-		observables.M_current = sum(σ)
+		observables           = Observables(Int)
 
 		return new(σ, params, observables, rng)
 	end
@@ -153,8 +151,7 @@ struct Potts <: AbstractMagnetismModel
 		params                = Parameters(L, β, n_sweeps, cutoff, start_type, seed, q)
 		rng                   = MersenneTwister(seed)
 		σ                     = initialize_σ_Potts(q, L, start_type, rng)
-		observables           = Observables()
-		observables.E_current = compute_E_Potts(σ)
+		observables           = Observables(Int)
 
 		return new(σ, params, observables, rng)
 	end
@@ -208,7 +205,7 @@ q          = 0
 struct XY <: AbstractMagnetismModel
 	σ          ::Array{NTuple{2, Float64}, 2}
 	params     ::Parameters
-	observables::XYObservables
+	observables::Observables
 	rng        ::MersenneTwister
 
 	function XY(
@@ -223,8 +220,7 @@ struct XY <: AbstractMagnetismModel
 		params      = Parameters(L, β, n_sweeps, cutoff, start_type, seed, 0)
 		rng         = MersenneTwister(seed)
 		σ           = initialize_σ_XY(L, start_type, rng)
-		observables = XYObservables()
-		observables.E_current, observables.Mx_current, observables.Mx_current = compute_E_M_XY(σ)
+		observables = Observables(Float64)
 
 		return new(σ, params, observables, rng)
 	end
