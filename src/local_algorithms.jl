@@ -1,7 +1,7 @@
 """
 	metropolis!(model::Ising)
 
-Implementation of the Metropolis local update algorithm for the Ising model.
+Implementation of the Metropolis algorithm for the Ising model.
 """
 function metropolis!(model::Ising)
 	t₀   = floor(Int, model.params.cutoff * model.params.n_sweeps)
@@ -30,7 +30,7 @@ end
 """
 	metropolis!(model::Potts)
 
-Implementation of the Metropolis local update algorithm for the Potts model.
+Implementation of the Metropolis algorithm for the Potts model.
 """
 function metropolis!(model::Potts)
 	t₀ = floor(Int, model.params.cutoff * model.params.n_sweeps)
@@ -60,7 +60,7 @@ end
 """
 	metropolis!(model::XY)
 
-Implementation of the Metropolis local update algorithm for the XY model.
+Implementation of the Metropolis algorithm for the XY model.
 """
 function metropolis!(model::XY)
 	t₀ = floor(Int, model.params.cutoff * model.params.n_sweeps)
@@ -155,7 +155,7 @@ end
 """
 	heat_bath!(model::XY)
 
-Implementation of the Metropolis local update algorithm for the XY model.
+Implementation of the heat bath algorithm for the XY model.
 """
 function heat_bath!(model::XY)
 	t₀ = floor(Int, model.params.cutoff * model.params.n_sweeps)
@@ -180,51 +180,4 @@ function heat_bath!(model::XY)
 
 	compute_observables_statistics!(model)
 	return model
-end
-
-
-"""
-	sum_of_neighbors(model::Ising, i::Int, j::Int)
-
-Sums the values of the neighbors for a given site (i, j).
-"""
-function sum_of_neighbors(model::Ising, i::Int, j::Int)
-	return (
-		model.σ[plus(i, model.params.L), j] +
-		model.σ[minus(i, model.params.L), j] +
-		model.σ[i, plus(j, model.params.L)] +
-		model.σ[i, minus(j, model.params.L)]
-		)
-end
-
-
-"""
-	compute_counts(model::Potts, i::Int, j::Int)
-
-Computes the counts/frequency of the different spin vaues neighboring `σ[i, j]`.
-"""
-function compute_counts(model::Potts, i::Int, j::Int)
-	counts = zeros(Int8, model.params.q)
-
-	counts[model.σ[plus(i, model.params.L), j]]  += 1
-	counts[model.σ[minus(i, model.params.L), j]] += 1
-	counts[model.σ[i, plus(j, model.params.L)]]  += 1
-	counts[model.σ[i, minus(j, model.params.L)]] += 1
-
-	return counts
-end
-
-
-"""
-	sum_of_neighbors(model::XY, i::Int, j::Int)
-
-Sums the values of the neighbors for a given site (i, j).
-"""
-function sum_of_neighbors(model::XY, i::Int, j::Int)
-	return (
-		model.σ[plus(i, model.params.L), j] .+
-		model.σ[minus(i, model.params.L), j] .+
-		model.σ[i, plus(j, model.params.L)] .+
-		model.σ[i, minus(j, model.params.L)]
-		)
 end

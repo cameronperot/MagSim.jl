@@ -18,108 +18,6 @@ end
 
 
 """
-	Parameters
-
-Type containing the parameters of a magnetism simulation.
-
-Attributes
-* `L`         : The side length of the lattice, e.g. for a square lattice there will be
-	`L^2` spins
-* `β`         : `1 / kT`, i.e. the inverse temperature
-* `n_sweeps`  : The number of update sweeps to run over the lattice
-* `cutoff`    : The first percentage of observable measurements to discard, useful to get
-	rid of values during thermalization period
-* `start_type`: `:cold` starts the lattice with all spins aligned, `:hot` all spins random
-* `seed`      : Seed value for the random number generator
-"""
-struct Parameters
-	L         ::Int
-	β         ::Float64
-	n_sweeps  ::Int
-	cutoff    ::Float64
-	start_type::Symbol
-	seed      ::Int
-	q         ::Int
-end
-
-
-function show(io::IO, params::Parameters)
-	println(
-		"""
-		L          = $(params.L)
-		β          = $(params.β)
-		n_sweeps   = $(params.n_sweeps)
-		start_type = $(params.start_type)
-		seed       = $(params.seed)
-		q          = $(params.q)
-		"""
-		)
-end
-
-
-"""
-	Observables()
-
-Type containing the observables data for a magnetism simulation.
-
-Attributes
-* `E_current`       : The current energy of the system
-* `E`               : Array tracking the energy of the system over the updates
-* `M_current`       : The current magnetization of the system
-* `M`               : Array tracking the magnetization of the system over the updates
-* `avg_cluster_size`: Average cluster size (applies only to cluster algorithms)
-* `statistics`      : Dictionary containing the per spin values of average energy, average
-	magnetization, heat capacity, magnetic susceptibility, Binder parameter, and the
-	integrated autocorrelation time (computed using the binning method)
-"""
-mutable struct Observables
-	E_current        ::Int
-	E                ::Array{Int, 1}
-	M_current        ::Int
-	M                ::Array{Int, 1}
-	avg_cluster_size ::Float64
-	statistics       ::Dict
-
-	function Observables()
-		new(0, [], 0, [], 0, Dict())
-	end
-end
-
-
-"""
-	XYObservables()
-
-Type containing the observables data for an XY simulation.
-
-Attributes
-* `E_current`       : The current energy of the system
-* `E`               : Array tracking the energy of the system over the updates
-* `Mx_current`      : The current x magnetization of the system
-* `Mx`              : Array tracking the x magnetization of the system over the updates
-* `My_current`      : The current y magnetization of the system
-* `My`              : Array tracking the y magnetization of the system over the updates
-* `avg_cluster_size`: Average cluster size (applies only to cluster algorithms)
-* `statistics`      : Dictionary containing the per spin values of average energy, average
-	magnetization, heat capacity, magnetic susceptibility, Binder parameter, and the
-	integrated autocorrelation time (computed using the binning method)
-"""
-mutable struct XYObservables
-	E_current        ::Float64
-	E                ::Array{Float64, 1}
-	Mx_current       ::Float64
-	Mx               ::Array{Float64, 1}
-	My_current       ::Float64
-	My               ::Array{Float64, 1}
-	avg_cluster_size ::Float64
-	statistics       ::Dict
-
-	function XYObservables()
-		new(0, [], 0, [], 0, [], 0, Dict())
-	end
-end
-
-
-"""
 	Ising(
 		L         ::Int,
 		β         ::Real;
@@ -169,16 +67,6 @@ struct Ising <: AbstractMagnetismModel
 	observables::Observables
 	rng        ::MersenneTwister
 
-	function Ising(params::Parameters)
-		rng                   = MersenneTwister(params.seed)
-		σ                     = initialize_σ_Ising(params.L, params.start_type, rng)
-		observables           = Observables()
-		observables.E_current = compute_E_Ising(σ)
-		observables.M_current = sum(σ)
-
-		new(σ, params, observables, rng)
-	end
-
 	function Ising(
 		L         ::Int,
 		β         ::Real;
@@ -188,9 +76,14 @@ struct Ising <: AbstractMagnetismModel
 		seed      ::Int    =8,
 		)
 
-		params = Parameters(L, β, n_sweeps, cutoff, start_type, seed, 0)
+		params                = Parameters(L, β, n_sweeps, cutoff, start_type, seed, 0)
+		rng                   = MersenneTwister(params.seed)
+		σ                     = initialize_σ_Ising(params.L, params.start_type, rng)
+		observables           = Observables()
+		observables.E_current = compute_E_Ising(σ)
+		observables.M_current = sum(σ)
 
-		Ising(params)
+		return new(σ, params, observables, rng)
 	end
 end
 
@@ -247,15 +140,6 @@ struct Potts <: AbstractMagnetismModel
 	observables::Observables
 	rng        ::MersenneTwister
 
-	function Potts(params::Parameters)
-		rng                   = MersenneTwister(params.seed)
-		σ                     = initialize_σ_Potts(params.q, params.L, params.start_type, rng)
-		observables           = Observables()
-		observables.E_current = compute_E_Potts(σ)
-
-		new(σ, params, observables, rng)
-	end
-
 	function Potts(
 		q         ::Int,
 		L         ::Int,
@@ -266,20 +150,14 @@ struct Potts <: AbstractMagnetismModel
 		seed      ::Int    =8,
 		)
 
-		params = Parameters(L, β, n_sweeps, cutoff, start_type, seed, q)
+		params                = Parameters(L, β, n_sweeps, cutoff, start_type, seed, q)
+		rng                   = MersenneTwister(seed)
+		σ                     = initialize_σ_Potts(q, L, start_type, rng)
+		observables           = Observables()
+		observables.E_current = compute_E_Potts(σ)
 
-		Potts(params)
+		return new(σ, params, observables, rng)
 	end
-end
-
-
-"""
-	dot(a::NTuple{2, Float64}, b::NTuple{2, Float64})
-
-Inner product of two `NTuple{2, Float64}`s.
-"""
-function dot(a::NTuple{2, Float64}, b::NTuple{2, Float64})
-	return a[1] * b[1] + a[2] * b[2]
 end
 
 
@@ -333,15 +211,6 @@ struct XY <: AbstractMagnetismModel
 	observables::XYObservables
 	rng        ::MersenneTwister
 
-	function XY(params::Parameters)
-		rng                   = MersenneTwister(params.seed)
-		σ                     = initialize_σ_XY(params.L, params.start_type, rng)
-		observables           = XYObservables()
-		observables.E_current = compute_E_M_XY(σ)[1]
-
-		new(σ, params, observables, rng)
-	end
-
 	function XY(
 		L         ::Int,
 		β         ::Real;
@@ -351,10 +220,12 @@ struct XY <: AbstractMagnetismModel
 		seed      ::Int    =8,
 		)
 
-		params = Parameters(L, β, n_sweeps, cutoff, start_type, seed, 0)
+		params      = Parameters(L, β, n_sweeps, cutoff, start_type, seed, 0)
+		rng         = MersenneTwister(seed)
+		σ           = initialize_σ_XY(L, start_type, rng)
+		observables = XYObservables()
+		observables.E_current, observables.Mx_current, observables.Mx_current = compute_E_M_XY(σ)
 
-		XY(params)
+		return new(σ, params, observables, rng)
 	end
-
-
 end

@@ -19,15 +19,16 @@ end
 
 
 """
-	compute_autocorrelation_time(model::AbstractMagnetismModel, ns::Array{Int, 1})
+	compute_autocorrelation_time(model::Union{Ising, Potts}, ns::Array{Int, 1})
 
 Computes the integrated autocorrelation time using the binning method. The autocorrelation
 time is the value at which the output sequence (either energy `:e` or magnetization `:m` in
 the return dictionary) asymptotes at.
 """
-function compute_autocorrelation_time(model::AbstractMagnetismModel, ns::Array{Int, 1})
-	e       = model.observables.E ./ length(model.σ)
-	m       = abs.(model.observables.M) ./ length(model.σ)
+function compute_autocorrelation_time(model::Union{Ising, Potts}, ns::Array{Int, 1})
+	V       = length(model.σ)
+	e       = model.observables.E ./ V
+	m       = abs.(model.observables.M) ./ V
 	N       = length(e)
 	σ²_e    = mean(e.^2) - mean(e)^2
 	σ²_m    = mean(m.^2) - mean(m)^2
@@ -35,7 +36,7 @@ function compute_autocorrelation_time(model::AbstractMagnetismModel, ns::Array{I
 	τ_int_m = []
 
 	for n in ns
-		N_B        = Int(floor(N / n))
+		N_B        = floor(Int, N / n)
 		e_bin_avgs = compute_bin_averages(e, n)
 		m_bin_avgs = compute_bin_averages(m, n)
 		ε²_e       = sum((e_bin_avgs .- mean(e_bin_avgs)).^2) / (N_B * (N_B - 1))
@@ -45,6 +46,43 @@ function compute_autocorrelation_time(model::AbstractMagnetismModel, ns::Array{I
 	end
 
 	return Dict(:e => τ_int_e, :m => τ_int_m)
+end
+
+
+"""
+	compute_autocorrelation_time(model::XY, ns::Array{Int, 1})
+
+Computes the integrated autocorrelation time using the binning method. The autocorrelation
+time is the value at which the output sequence (either energy `:e` or magnetization `:m` in
+the return dictionary) asymptotes at.
+"""
+function compute_autocorrelation_time(model::XY, ns::Array{Int, 1})
+	V        = length(model.σ)
+	e        = model.observables.E ./ V
+	mx       = abs.(model.observables.Mx) ./ V
+	my       = abs.(model.observables.My) ./ V
+	N        = length(e)
+	σ²_e     = mean(e.^2) - mean(e)^2
+	σ²_mx    = mean(mx.^2) - mean(mx)^2
+	σ²_my    = mean(my.^2) - mean(my)^2
+	τ_int_e  = []
+	τ_int_mx = []
+	τ_int_my = []
+
+	for n in ns
+		N_B         = floor(Int, N / n)
+		e_bin_avgs  = compute_bin_averages(e, n)
+		mx_bin_avgs = compute_bin_averages(mx, n)
+		my_bin_avgs = compute_bin_averages(my, n)
+		ε²_e        = sum((e_bin_avgs .- mean(e_bin_avgs)).^2) / (N_B * (N_B - 1))
+		ε²_mx       = sum((mx_bin_avgs .- mean(mx_bin_avgs)).^2) / (N_B * (N_B - 1))
+		ε²_my       = sum((my_bin_avgs .- mean(my_bin_avgs)).^2) / (N_B * (N_B - 1))
+		push!(τ_int_e, ε²_e * N / 2σ²_e)
+		push!(τ_int_mx, ε²_mx * N / 2σ²_mx)
+		push!(τ_int_my, ε²_my * N / 2σ²_my)
+	end
+
+	return Dict(:e => τ_int_e, :mx => τ_int_mx, :my => τ_int_my)
 end
 
 

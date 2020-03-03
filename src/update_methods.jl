@@ -76,5 +76,5 @@ function compute_observables_statistics!(model::XY)
 	model.observables.statistics[:m²]  = mean(model.observables.Mx.^2 .+ model.observables.My.^2) / V^2
 	model.observables.statistics[:c]   = model.params.β^2 * var(model.observables.E) / V
 	model.observables.statistics[:χ]   = V * model.observables.statistics[:m²]
-	# model.observables.statistics[:τ_int] = compute_autocorrelation_time(model, collect(1:400))
+	model.observables.statistics[:τ_int] = compute_autocorrelation_time(model, collect(1:400))
 end
