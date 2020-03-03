@@ -1,6 +1,15 @@
 """
-	simulate_βs_and_Ls(model::AbstractMagnetismModel, βs, Ls)
+	simulate_Ising_parallel(
+		algorithm ::Function,
+		Ls        ::Array{Int, 1},
+		βs        ::Union{Array{Float64}, AbstractRange{Float64}};
+		n_sweeps  ::Int     =10^5,
+		cutoff    ::Float64 =0.2,
+		start_type::Symbol  =:cold,
+		seed      ::Int     =8,
+		)
 
+Runs multiple Ising simulations in parallel.
 """
 function simulate_Ising_parallel(
 	algorithm ::Function,

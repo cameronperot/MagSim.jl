@@ -1,5 +1,5 @@
 """
-	compute_E_Ising(σ::Array{Int, 2})
+	compute_E_Ising(σ::Array{Int8, 2})
 
 Computes the Ising model internal energy for the input spin configuration `σ`.
 """
@@ -15,7 +15,7 @@ end
 
 
 """
-	compute_E_Potts(σ::Array{Int, 2})
+	compute_E_Potts(σ::Array{Int8, 2})
 
 Computes the Potts model internal energy for the input spin configuration `σ`.
 """
@@ -31,7 +31,7 @@ end
 
 
 """
-	compute_E_XY(σ::Array{NTuple{2, Float64}, 2})
+	compute_E_M_XY(σ::Array{NTuple{2, Float64}, 2})
 
 Computes the XY model internal energy for the input spin configuration `σ`.
 """
@@ -91,11 +91,11 @@ end
 	initialize_σ_XY(L::Int, start_type::Symbol, rng::MersenneTwister)
 
 
-Initialize the XY model lattice `σ` with `NTuple{2, Float64}`s.
+Initialize the XY model lattice `σ` with unit vectors represented by `NTuple{2, Float64}`.
 """
 function initialize_σ_XY(L::Int, start_type::Symbol, rng::MersenneTwister)
 	if start_type == :cold
-		σ = [(0, 1) for i in 1:L, j in 1:L]
+		σ = [(0.0, 1.0) for i in 1:L, j in 1:L]
 	elseif start_type == :hot
 		σ = [random_XYVector(rng) for i in 1:L, j in 1:L]
 	else
@@ -109,7 +109,7 @@ end
 """
 	random_XYVector(rng::MersenneTwister)
 
-Generates a random `NTuple{2, Float64}`.
+Generates a random unit vector represented by `NTuple{2, Float64}`.
 """
 function random_XYVector(rng::MersenneTwister)
 	θ = rand(rng) * 2π
