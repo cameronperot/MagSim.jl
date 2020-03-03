@@ -83,10 +83,51 @@ end
 
 
 """
-	wolff!(model::XY)
+	wolff!(model::XY, avg_cluster_size::Int)
 
+Implementation of the Wolff single cluster algorithm for the XY model.
 """
-function wolff!(model::XY)
+function wolff!(model::XY, avg_cluster_size::Int)
+	P          = 1 - exp(-2 * model.params.β)
+	n_clusters = Int(ceil(model.params.L^2 / avg_cluster_size))
+	t₀         = floor(Int, model.params.cutoff * model.params.n_sweeps)
+	indices    = 1:length(model.σ)
+
+	for t in 1:model.params.n_sweeps
+		for n in 1:n_clusters
+			r       = random_XYVector(model.rng)
+			idx     = CartesianIndices(model.σ)[rand(model.rng, indices)]
+			i, j    = idx[1], idx[2]
+			stack   = [(i, j)]
+			cluster = Set([(i, j)])
+			flip_spin!(model, i, j, r)
+
+			while length(stack) > 0
+				i, j = pop!(stack)
+				spin = model.σ[i, j]
+
+				for (k, l) in get_neighbor_indices(model, i, j)
+					if (k, l) ∉ cluster
+						neighbor_spin = model.σ[k, l]
+
+						if rand(model.rng) < 1 - exp(2 * model.params.β * dot(spin, r) * dot(neighbor_spin, r))
+							push!(stack, (k, l))
+							push!(cluster, (k, l))
+							flip_spin!(model, k, l, r)
+						end
+					end
+				end
+			end
+
+			t > t₀ && (model.observables.avg_cluster_size += length(cluster))
+		end
+
+		t > t₀ && update_observables!(model)
+	end
+
+	model.observables.avg_cluster_size /= (model.params.n_sweeps * n_clusters)
+	compute_observables_statistics!(model)
+	return model
 end
 
 
