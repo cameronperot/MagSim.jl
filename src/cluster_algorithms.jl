@@ -1,6 +1,7 @@
 """
-	wolff!(model::Ising)
+	wolff!(model::Ising, avg_cluster_size::Int)
 
+Implementation of the Wolff single cluster algorithm for the Ising model.
 """
 function wolff!(model::Ising, avg_cluster_size::Int)
 	P          = 1 - exp(-2 * model.params.β)
@@ -15,18 +16,14 @@ function wolff!(model::Ising, avg_cluster_size::Int)
 			old_spin      = model.σ[i, j]
 			new_spin      = -old_spin
 			model.σ[i, j] = new_spin
-			model.observables.E_current -= 2 * new_spin * sum_of_neighbors(model, i, j)
-			model.observables.M_current += 2 * new_spin
 
-			cluster = Tuple{Int, Int}[(i, j)]
+			cluster = [(i, j)]
 			for (i, j) in cluster
 				neighbors = get_neighbor_indices(model, i, j)
 				for (k, l) in neighbors
 					if model.σ[k, l] == old_spin && rand(model.rng) < P
 						model.σ[k, l] = new_spin
 						push!(cluster, (k, l))
-						model.observables.E_current -= 2 * new_spin * sum_of_neighbors(model, k, l)
-						model.observables.M_current += 2 * new_spin
 					end
 				end
 			end
@@ -44,8 +41,9 @@ end
 
 
 """
-	wolff!(model::Potts)
+	wolff!(model::Potts, avg_cluster_size::Int)
 
+Implementation of the Wolff single cluster algorithm for the Potts model.
 """
 function wolff!(model::Potts, avg_cluster_size::Int)
 	P          = 1 - exp(-model.params.β)
@@ -60,18 +58,14 @@ function wolff!(model::Potts, avg_cluster_size::Int)
 			old_spin      = model.σ[i, j]
 			new_spin      = rand(model.rng, UnitRange{Int8}(1, model.params.q))
 			model.σ[i, j] = new_spin
-			counts        = compute_counts(model, i, j)
-			model.observables.E_current += counts[old_spin] - counts[new_spin]
 
-			cluster = Tuple{Int, Int}[(i, j)]
+			cluster = [(i, j)]
 			for (i, j) in cluster
 				neighbors = get_neighbor_indices(model, i, j)
 				for (k, l) in neighbors
 					if model.σ[k, l] == old_spin && rand(model.rng) < P
 						model.σ[k, l] = new_spin
 						push!(cluster, (k, l))
-						counts = compute_counts(model, k, l)
-						model.observables.E_current += counts[old_spin] - counts[new_spin]
 					end
 				end
 			end
