@@ -1,27 +1,77 @@
 """
-	minus(i::Int, L::Int)
+	compute_E_M_Ising(σ::Array{Int8, 2})
 
-Helper function for computing nearest neighbor indices with periodic boundary conditions.
+Computes the Ising model internal energy and magnetization for the input spin configuration `σ`.
 """
-minus(i::Int, L::Int) = i ≠ 1 ? i-1 : L
+function compute_E_M_Ising(σ::Array{Int8, 2})
+	E::Int = 0
+	M::Int = 0
+	L = size(σ, 1)
+	for j in 1:L, i in 1:L
+		E -= σ[i, j] * (σ[plus(i, L), j] + σ[i, plus(j, L)])
+		M += σ[i, j]
+	end
+
+	return (E, M)
+end
 
 
 """
-	plus(i::Int, L::Int)
+	compute_E_Potts(σ::Array{Int8, 2})
 
-Helper function for computing nearest neighbor indices with periodic boundary conditions.
+Computes the Potts model internal energy for the input spin configuration `σ`.
 """
-plus(i::Int, L::Int) = i ≠ L ? i+1 : 1
+function compute_E_Potts(σ::Array{Int8, 2})
+	E::Int = 0
+	L = size(σ, 1)
+	for j in 1:L, i in 1:L
+		E -= Int(σ[i, j] == σ[plus(i, L), j]) + Int(σ[i, j] == σ[i, plus(j, L)])
+	end
+
+	return E
+end
 
 
 """
-	update_observables!(model::Union{Ising, Potts})
+	compute_E_M_XY(σ::Array{NTuple{2, Float64}, 2})
+
+Computes the XY model internal energy and magnetization for the input spin configuration `σ`.
+"""
+function compute_E_M_XY(σ::Array{NTuple{2, Float64}, 2})
+	E  = 0.
+	Mx = 0.
+	My = 0.
+	L = size(σ, 1)
+	for j in 1:L, i in 1:L
+		E  -= dot(σ[i, j], σ[plus(i, L), j]) + dot(σ[i, j], σ[i, plus(j, L)])
+		Mx += σ[i, j][1]
+		My += σ[i, j][2]
+	end
+
+	return (E, Mx, My)
+end
+
+
+"""
+	update_observables!(model::Ising)
 
 Pushes the current energy and magnetization to their respective arrays.
 """
-function update_observables!(model::Union{Ising, Potts})
-	push!(model.observables.E, model.observables.E_current)
-	push!(model.observables.M, model.observables.M_current)
+function update_observables!(model::Ising)
+	E, M = compute_E_M_Ising(model.σ)
+	push!(model.observables.E, E)
+	push!(model.observables.M, M)
+end
+
+
+"""
+	update_observables!(model::Potts)
+
+Pushes the current energy and magnetization to their respective arrays.
+"""
+function update_observables!(model::Potts)
+	E = compute_E_Potts(model.σ)
+	push!(model.observables.E, E)
 end
 
 
@@ -31,9 +81,10 @@ end
 Pushes the current energy and magnetization to their respective arrays.
 """
 function update_observables!(model::XY)
-	push!(model.observables.E, model.observables.E_current)
-	push!(model.observables.Mx, model.observables.Mx_current)
-	push!(model.observables.My, model.observables.My_current)
+	E, Mx, My = compute_E_M_XY(model.σ)
+	push!(model.observables.E, E)
+	push!(model.observables.Mx, Mx)
+	push!(model.observables.My, My)
 end
 
 

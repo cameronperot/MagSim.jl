@@ -54,3 +54,39 @@ function compute_counts(model::Potts, i::Int, j::Int)
 
 	return counts
 end
+
+
+"""
+	flip_spin(model::XY, i::Int, j::Int, r::NTuple{2, Float64})
+
+Flips an XY model spin w.r.t. a random vector `r`.
+"""
+function flip_spin(model::XY, i::Int, j::Int, r::NTuple{2, Float64})
+	return model.σ[i, j] .- 2dot(model.σ[i, j], r) .* r
+end
+
+
+"""
+	flip_spin!(model::XY, i::Int, j::Int, r::NTuple{2, Float64})
+
+Flips an XY model spin w.r.t. a random vector `r`.
+"""
+function flip_spin!(model::XY, i::Int, j::Int, r::NTuple{2, Float64})
+	model.σ[i, j] = flip_spin(model, i, j, r)
+end
+
+
+"""
+	minus(i::Int, L::Int)
+
+Returns the "minus" nearest neighbor index with periodic boundary conditions.
+"""
+minus(i::Int, L::Int) = i ≠ 1 ? i-1 : L
+
+
+"""
+	plus(i::Int, L::Int)
+
+Returns the "plus" nearest neighbor index with periodic boundary conditions.
+"""
+plus(i::Int, L::Int) = i ≠ L ? i+1 : 1
