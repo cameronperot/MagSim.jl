@@ -87,9 +87,42 @@ end
 
 
 """
+	XYObservables()
+
+Type containing the observables data for an XY simulation.
+
+Attributes
+* `E_current`       : The current energy of the system
+* `E`               : Array tracking the energy of the system over the updates
+* `Mx_current`      : The current x magnetization of the system
+* `Mx`              : Array tracking the x magnetization of the system over the updates
+* `My_current`      : The current y magnetization of the system
+* `My`              : Array tracking the y magnetization of the system over the updates
+* `avg_cluster_size`: Average cluster size (applies only to cluster algorithms)
+* `statistics`      : Dictionary containing the per spin values of average energy, average
+	magnetization, heat capacity, magnetic susceptibility, Binder parameter, and the
+	integrated autocorrelation time (computed using the binning method)
+"""
+mutable struct XYObservables
+	E_current        ::Float64
+	E                ::Array{Float64, 1}
+	Mx_current       ::Float64
+	Mx               ::Array{Float64, 1}
+	My_current       ::Float64
+	My               ::Array{Float64, 1}
+	avg_cluster_size ::Float64
+	statistics       ::Dict
+
+	function XYObservables()
+		new(0, [], 0, [], 0, [], 0, Dict())
+	end
+end
+
+
+"""
 	Ising(
 		L         ::Int,
-		β         ::Float64;
+		β         ::Real;
 		n_sweeps  ::Int    =10^5,
 		cutoff    ::Float64=0.2,
 		start_type::Symbol =:cold,
@@ -166,7 +199,7 @@ end
 	Potts(
 		q         ::Int,
 		L         ::Int,
-		β         ::Float64;
+		β         ::Real;
 		n_sweeps  ::Int    =10^5,
 		cutoff    ::Float64=0.2,
 		start_type::Symbol =:cold,
@@ -191,7 +224,7 @@ Returns
 * A new instance of `Potts`
 
 Attributes
-* `σ`          : Lattice containing the spins, values are ±1
+* `σ`          : Lattice containing the spins, values are ∈ {1, ..., q}
 * `params`     : Parameters type, contains relevant parameters for the simulation
 * `observables`: Observables type, contains relevant observables data for the simulation
 * `rng`        : MersenneTwister type random number generator
@@ -241,8 +274,87 @@ end
 
 
 """
-	XY
+	dot(a::NTuple{2, Float64}, b::NTuple{2, Float64})
+
+Inner product of two `NTuple{2, Float64}`s.
+"""
+function dot(a::NTuple{2, Float64}, b::NTuple{2, Float64})
+	return a[1] * b[1] + a[2] * b[2]
+end
+
 
 """
+	XY(
+		L         ::Int,
+		β         ::Real;
+		n_sweeps  ::Int    =10^5,
+		cutoff    ::Float64=0.2,
+		start_type::Symbol =:cold,
+		seed      ::Int    =8,
+		)
+
+Type representing an XY model.
+
+Arguments
+* `L`: The side length of the lattice, i.e. for a square lattice there will be `L^2` spins
+* `β`: `1 / kT`, i.e. the inverse temperature
+
+Keyword Arguments
+* `n_sweeps`  : The number of update sweeps to run over the lattice
+* `cutoff`    : The percentage of measurements to throw away, i.e. throw away values during
+	thermalization
+* `start_type`: `:cold` starts the lattice with all spins aligned, `:hot` all spins random
+* `seed`      : Seed value for the random number generator
+
+Returns
+* A new instance of `XY`
+
+Attributes
+* `σ`          : Lattice containing the spins, values are 2D unit vectors
+* `params`     : Parameters type, contains relevant parameters for the simulation
+* `observables`: Observables type, contains relevant observables data for the simulation
+* `rng`        : MersenneTwister type random number generator
+
+# Examples
+```julia-repl
+julia> XY(32, 1)
+XY
+L          = 32
+β          = 1.0
+n_sweeps   = 100000
+start_type = cold
+seed       = 8
+q          = 0
+```
+"""
 struct XY <: AbstractMagnetismModel
+	σ          ::Array{NTuple{2, Float64}, 2}
+	params     ::Parameters
+	observables::XYObservables
+	rng        ::MersenneTwister
+
+	function XY(params::Parameters)
+		rng                   = MersenneTwister(params.seed)
+		σ                     = initialize_σ_XY(params.L, params.start_type, rng)
+		observables           = XYObservables()
+		observables.E_current = compute_E_M_XY(σ)[1]
+
+		new(σ, params, observables, rng)
+	end
+
+	function XY(
+		L         ::Int,
+		β         ::Real;
+		n_sweeps  ::Int    =10^5,
+		cutoff    ::Float64=0.2,
+		start_type::Symbol =:cold,
+		seed      ::Int    =8,
+		)
+
+		params = Parameters(L, β, n_sweeps, cutoff, start_type, seed, 0)
+
+		XY(params)
+	end
+
+
 end

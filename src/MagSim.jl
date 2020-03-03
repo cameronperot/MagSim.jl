@@ -5,7 +5,7 @@ using DataFrames
 using Random: MersenneTwister, rand
 using Statistics: mean, var
 
-import Base.show
+import Base: show
 
 export
 
@@ -14,6 +14,8 @@ MagnetismModels,
 Ising,
 Potts,
 XY,
+XYVector,
+
 # analysis_methods
 sim_dict_to_df,
 
