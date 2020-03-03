@@ -46,3 +46,29 @@ function compute_autocorrelation_time(model::AbstractMagnetismModel, ns::Array{I
 
 	return Dict(:e => τ_int_e, :m => τ_int_m)
 end
+
+
+"""
+	sim_dict_to_df(sims::Dict)
+
+Converts a dictionary where the values are models into a DataFrame object.
+"""
+function sim_dict_to_df(sims::Dict)
+	df = DataFrame(L=Int[], β=Float64[],
+		e=Float64[], c=Float64[],
+		m=Float64[], χ=Float64[],
+		U=Float64[],
+		)
+
+	for sim in values(sims)
+		push!(df,
+			[sim.params.L, sim.params.β,
+			sim.observables.statistics[:e], sim.observables.statistics[:c],
+			sim.observables.statistics[:m], sim.observables.statistics[:χ],
+			sim.observables.statistics[:U]]
+			)
+	end
+	sort!(df, [:L, :β])
+
+	return df
+end

@@ -14,6 +14,8 @@ MagnetismModels,
 Ising,
 Potts,
 XY,
+# analysis_methods
+sim_dict_to_df,
 
 # cluster_algorithms
 wolff!,
@@ -24,7 +26,7 @@ metropolis!,
 heat_bath!,
 
 # parallel_simulation_methods
-simulate_βs_and_Ls,
+simulate_Ising_parallel,
 
 # plotting_methods
 plot_energy,
