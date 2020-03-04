@@ -19,8 +19,7 @@ function wolff!(model::Ising, avg_cluster_size::Int)
 
 			cluster = [(i, j)]
 			for (i, j) in cluster
-				neighbors = get_neighbor_indices(model, i, j)
-				for (k, l) in neighbors
+				for (k, l) in get_neighbor_indices(model, i, j)
 					if model.σ[k, l] == old_spin && rand(model.rng) < P
 						model.σ[k, l] = new_spin
 						push!(cluster, (k, l))
@@ -61,8 +60,7 @@ function wolff!(model::Potts, avg_cluster_size::Int)
 
 			cluster = [(i, j)]
 			for (i, j) in cluster
-				neighbors = get_neighbor_indices(model, i, j)
-				for (k, l) in neighbors
+				for (k, l) in get_neighbor_indices(model, i, j)
 					if model.σ[k, l] == old_spin && rand(model.rng) < P
 						model.σ[k, l] = new_spin
 						push!(cluster, (k, l))
@@ -98,10 +96,10 @@ function wolff!(model::XY, avg_cluster_size::Int)
 			r       = random_XYVector(model.rng)
 			idx     = CartesianIndices(model.σ)[rand(model.rng, indices)]
 			i, j    = idx[1], idx[2]
-			stack   = [(i, j)]
-			cluster = Set([(i, j)])
 			flip_spin!(model, i, j, r)
 
+			stack   = [(i, j)]
+			cluster = Set(stack)
 			while length(stack) > 0
 				i, j = pop!(stack)
 				spin = model.σ[i, j]
