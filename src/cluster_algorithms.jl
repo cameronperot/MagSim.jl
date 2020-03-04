@@ -134,6 +134,37 @@ end
 
 """
 function swendsen_wang!(model::Ising)
+	P          = 1 - exp(-2 * model.params.β)
+	t₀         = floor(Int, model.params.cutoff * model.params.n_sweeps)
+
+	for t in 1:model.params.n_sweeps
+		clustered = Set{Tuple{Int, Int}}()
+
+		for j in 1:model.params.L, i in model.params.L
+			(i, j) ∈ clustered && continue
+			old_spin = model.σ[i, j]
+			new_spin = rand(model.rng, Int8[-1, 1])
+			model.σ[i, j] = new_spin
+			push!(clustered, (i, j))
+
+			stack = [(i, j)]
+			while length(stack) > 0
+				(i, j) = pop!(stack)
+				for (k, l) in get_neighbor_indices(model, i, j)
+					if model.σ[k, l] == old_spin && (k, l) ∉ clustered && rand(model.rng) < P
+						model.σ[k, l] = new_spin
+						push!(stack, (k, l))
+						push!(clustered, (k, l))
+					end
+				end
+			end
+		end
+
+		t > t₀ && update_observables!(model)
+	end
+
+	compute_observables_statistics!(model)
+	return model
 end
 
 
