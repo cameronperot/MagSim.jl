@@ -1,9 +1,9 @@
 """
-	get_neighbor_indices(model::Ising, i::Int, j::Int)
+	get_neighbor_indices(model::Ising, (i, j)::NTuple{2, Int})
 
 Returns the indices of the nearest neighbors for a given lattice site (i, j).
 """
-function get_neighbor_indices(model::AbstractMagnetismModel, i::Int, j::Int)
+function get_neighbor_indices(model::AbstractMagnetismModel, (i, j)::NTuple{2, Int})
 	return (
 		(plus(i, model.params.L), j),
 		(minus(i, model.params.L), j),
@@ -14,11 +14,11 @@ end
 
 
 """
-	sum_of_neighbors(model::Union{Ising, XY}, i::Int, j::Int)
+	sum_of_neighbors(model::Union{Ising, XY}, (i, j)::NTuple{2, Int})
 
 Sums the values of the nearest neighbors for a given lattice site (i, j).
 """
-function sum_of_neighbors(model::Union{Ising, XY}, i::Int, j::Int)
+function sum_of_neighbors(model::Union{Ising, XY}, (i, j)::NTuple{2, Int})
 	return @. (
 		model.σ[plus(i, model.params.L), j] +
 		model.σ[minus(i, model.params.L), j] +
@@ -40,11 +40,11 @@ end
 
 
 """
-	compute_counts(model::Potts, i::Int, j::Int)
+	compute_counts(model::Potts, (i, j)::NTuple{2, Int})
 
 Computes the counts/frequency of the different spin vaues neighboring `σ[i, j]`.
 """
-function compute_counts(model::Potts, i::Int, j::Int)
+function compute_counts(model::Potts, (i, j)::NTuple{2, Int})
 	counts = zeros(Int, model.params.q)
 
 	counts[model.σ[plus(i, model.params.L), j]]  += 1
@@ -57,22 +57,22 @@ end
 
 
 """
-	flip_spin(model::XY, i::Int, j::Int, r::NTuple{2, Float64})
+	flip_spin(model::XY, (i, j)::NTuple{2, Int}, r::NTuple{2, Float64})
 
 Flips an XY model spin w.r.t. a random vector `r`.
 """
-function flip_spin(model::XY, i::Int, j::Int, r::NTuple{2, Float64})
+function flip_spin(model::XY, (i, j)::NTuple{2, Int}, r::NTuple{2, Float64})
 	return model.σ[i, j] .- 2dot(model.σ[i, j], r) .* r
 end
 
 
 """
-	flip_spin!(model::XY, i::Int, j::Int, r::NTuple{2, Float64})
+	flip_spin!(model::XY, (i, j)::NTuple{2, Int}, r::NTuple{2, Float64})
 
 Flips an XY model spin w.r.t. a random vector `r`.
 """
-function flip_spin!(model::XY, i::Int, j::Int, r::NTuple{2, Float64})
-	model.σ[i, j] = flip_spin(model, i, j, r)
+function flip_spin!(model::XY, (i, j)::NTuple{2, Int}, r::NTuple{2, Float64})
+	model.σ[i, j] = flip_spin(model, (i, j), r)
 end
 
 

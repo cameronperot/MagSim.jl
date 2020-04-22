@@ -19,7 +19,7 @@ function wolff!(model::Ising, avg_cluster_size::Int)
 
 			cluster = [(i, j)]
 			for (i, j) in cluster
-				for (k, l) in get_neighbor_indices(model, i, j)
+				for (k, l) in get_neighbor_indices(model, (i, j))
 					if model.σ[k, l] == old_spin && rand(model.rng) < P
 						model.σ[k, l] = new_spin
 						push!(cluster, (k, l))
@@ -60,7 +60,7 @@ function wolff!(model::Potts, avg_cluster_size::Int)
 
 			cluster = [(i, j)]
 			for (i, j) in cluster
-				for (k, l) in get_neighbor_indices(model, i, j)
+				for (k, l) in get_neighbor_indices(model, (i, j))
 					if model.σ[k, l] == old_spin && rand(model.rng) < P
 						model.σ[k, l] = new_spin
 						push!(cluster, (k, l))
@@ -96,7 +96,7 @@ function wolff!(model::XY, avg_cluster_size::Int)
 			r       = random_XYVector(model.rng)
 			idx     = CartesianIndices(model.σ)[rand(model.rng, indices)]
 			i, j    = idx[1], idx[2]
-			flip_spin!(model, i, j, r)
+			flip_spin!(model, (i, j), r)
 
 			stack   = [(i, j)]
 			cluster = Set(stack)
@@ -104,14 +104,14 @@ function wolff!(model::XY, avg_cluster_size::Int)
 				i, j = pop!(stack)
 				spin = model.σ[i, j]
 
-				for (k, l) in get_neighbor_indices(model, i, j)
+				for (k, l) in get_neighbor_indices(model, (i, j))
 					if (k, l) ∉ cluster
 						neighbor_spin = model.σ[k, l]
 
 						if rand(model.rng) < 1 - exp(2 * model.params.β * dot(spin, r) * dot(neighbor_spin, r))
 							push!(stack, (k, l))
 							push!(cluster, (k, l))
-							flip_spin!(model, k, l, r)
+							flip_spin!(model, (k, l), r)
 						end
 					end
 				end
@@ -150,7 +150,7 @@ function swendsen_wang!(model::Ising)
 			stack = [(i, j)]
 			while length(stack) > 0
 				(i, j) = pop!(stack)
-				for (k, l) in get_neighbor_indices(model, i, j)
+				for (k, l) in get_neighbor_indices(model, (i, j))
 					if model.σ[k, l] == old_spin && (k, l) ∉ clustered && rand(model.rng) < P
 						model.σ[k, l] = new_spin
 						push!(stack, (k, l))
