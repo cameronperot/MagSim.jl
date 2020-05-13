@@ -108,8 +108,7 @@ end
 Implementation of the heat bath algorithm for the Potts model.
 """
 function heat_bath!(model::Potts)
-	t₀   = floor(Int, model.params.cutoff * model.params.n_sweeps)
-	P = exp.(model.params.β .* collect(0:4))
+	t₀ = floor(Int, model.params.cutoff * model.params.n_sweeps)
 
 	for t in 1:model.params.n_sweeps
 		for j in 1:model.params.L, i in 1:model.params.L
