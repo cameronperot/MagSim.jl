@@ -4,15 +4,15 @@
 Implementation of the Metropolis algorithm for the Ising model.
 """
 function metropolis!(model::Ising)
-	t₀   = floor(Int, model.params.cutoff * model.params.n_sweeps)
-	ΔEs  = [-8, -4, 0, 4, 8]
-	exps = exp(-model.params.β) .^ ΔEs
+	t₀ = floor(Int, model.params.cutoff * model.params.n_sweeps)
+	ΔE = [-8, -4, 0, 4, 8]
+	P  = exp(-model.params.β) .^ ΔE
 
 	for t in 1:model.params.n_sweeps
 		for j in 1:model.params.L, i in 1:model.params.L
 			k = Int(model.σ[i, j] * sum_of_neighbors(model, (i, j)) / 2 + 3)
 
-			(ΔEs[k] <= 0 || rand(model.rng) < exps[k]) && (model.σ[i, j] *= -1)
+			(ΔE[k] <= 0 || rand(model.rng) < P[k]) && (model.σ[i, j] *= -1)
 		end
 
 		t > t₀ && update_observables!(model)
@@ -82,15 +82,15 @@ end
 Implementation of the heat bath algorithm for the Ising model.
 """
 function heat_bath!(model::Ising)
-	t₀   = floor(Int, model.params.cutoff * model.params.n_sweeps)
-	ΔEs  = [-8, -4, 0, 4, 8]
-	exps = exp(-model.params.β) .^ ΔEs
+	t₀ = floor(Int, model.params.cutoff * model.params.n_sweeps)
+	ΔE = [-8, -4, 0, 4, 8]
+	P  = exp(-model.params.β) .^ ΔE
 
 	for t in 1:model.params.n_sweeps
 		for j in 1:model.params.L, i in 1:model.params.L
 			k = Int(model.σ[i, j] * sum_of_neighbors(model, (i, j)) / 2 + 3)
 
-			(rand(model.rng) < exps[k] / (exps[k] + 1)) && (model.σ[i, j] *= -1)
+			(rand(model.rng) < P[k] / (P[k] + 1)) && (model.σ[i, j] *= -1)
 		end
 
 		t > t₀ && update_observables!(model)
@@ -108,7 +108,7 @@ Implementation of the heat bath algorithm for the Potts model.
 """
 function heat_bath!(model::Potts)
 	t₀   = floor(Int, model.params.cutoff * model.params.n_sweeps)
-	exps = exp.(model.params.β .* collect(0:4))
+	P = exp.(model.params.β .* collect(0:4))
 
 	for t in 1:model.params.n_sweeps
 		for j in 1:model.params.L, i in 1:model.params.L
