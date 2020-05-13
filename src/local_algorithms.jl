@@ -30,16 +30,17 @@ Implementation of the Metropolis algorithm for the Potts model.
 """
 function metropolis!(model::Potts)
 	t₀ = floor(Int, model.params.cutoff * model.params.n_sweeps)
-	eᵝ = exp(-model.params.β)
+	ΔE = collect(-4:4)
+	P  = exp(-model.params.β) .^ ΔE
 
 	for t in 1:model.params.n_sweeps
 		for j in 1:model.params.L, i in 1:model.params.L
 			counts   = compute_counts(model, (i, j))
 			old_spin = model.σ[i, j]
 			new_spin = rand(model.rng, UnitRange{Int8}(1, model.params.q))
-			ΔE       = counts[old_spin] - counts[new_spin]
+			k        = (counts[old_spin] - counts[new_spin]) + 5
 
-			(ΔE <= 0 || rand(model.rng) < eᵝ^ΔE) && (model.σ[i, j] = new_spin)
+			(ΔE[k] <= 0 || rand(model.rng) < P[k]) && (model.σ[i, j] = new_spin)
 		end
 
 		t > t₀ && update_observables!(model)
