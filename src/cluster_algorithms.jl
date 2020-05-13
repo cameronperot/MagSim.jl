@@ -35,7 +35,6 @@ function wolff!(model::Ising, avg_cluster_size::Int)
 
 	model.observables.avg_cluster_size /= (model.params.n_sweeps * n_clusters)
 	compute_observables_statistics!(model)
-	return model
 end
 
 
@@ -76,7 +75,6 @@ function wolff!(model::Potts, avg_cluster_size::Int)
 
 	model.observables.avg_cluster_size /= (model.params.n_sweeps * n_clusters)
 	compute_observables_statistics!(model)
-	return model
 end
 
 
@@ -125,7 +123,6 @@ function wolff!(model::XY, avg_cluster_size::Int)
 
 	model.observables.avg_cluster_size /= (model.params.n_sweeps * n_clusters)
 	compute_observables_statistics!(model)
-	return model
 end
 
 
@@ -164,7 +161,6 @@ function swendsen_wang!(model::Ising)
 	end
 
 	compute_observables_statistics!(model)
-	return model
 end
 
 
