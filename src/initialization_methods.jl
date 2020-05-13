@@ -1,9 +1,9 @@
 """
-	initialize_σ_Ising(L::Int, start_type::Symbol, rng::MersenneTwister)
+	initialize_σ_Ising(L::Int, start_type::Symbol, rng::AbstractRNG)
 
 Initialize the Ising model lattice `σ` with values ∈ {-1, 1}.
 """
-function initialize_σ_Ising(L::Int, start_type::Symbol, rng::MersenneTwister)
+function initialize_σ_Ising(L::Int, start_type::Symbol, rng::AbstractRNG)
 	if start_type == :cold
 		σ = ones(Int8, (L, L))
 	elseif start_type == :hot
@@ -17,12 +17,12 @@ end
 
 
 """
-	initialize_σ_Potts(q::Int, L::Int, start_type::Symbol, rng::MersenneTwister)
+	initialize_σ_Potts(q::Int, L::Int, start_type::Symbol, rng::AbstractRNG)
 
 
 Initialize the Potts model lattice `σ` with values ∈ {1, ..., q}.
 """
-function initialize_σ_Potts(q::Int, L::Int, start_type::Symbol, rng::MersenneTwister)
+function initialize_σ_Potts(q::Int, L::Int, start_type::Symbol, rng::AbstractRNG)
 	if start_type == :cold
 		σ = ones(Int8, (L, L))
 	elseif start_type == :hot
@@ -36,12 +36,12 @@ end
 
 
 """
-	initialize_σ_XY(L::Int, start_type::Symbol, rng::MersenneTwister)
+	initialize_σ_XY(L::Int, start_type::Symbol, rng::AbstractRNG)
 
 
 Initialize the XY model lattice `σ` with unit vectors represented by `NTuple{2, Float64}`.
 """
-function initialize_σ_XY(L::Int, start_type::Symbol, rng::MersenneTwister)
+function initialize_σ_XY(L::Int, start_type::Symbol, rng::AbstractRNG)
 	if start_type == :cold
 		σ = [(0.0, 1.0) for i in 1:L, j in 1:L]
 	elseif start_type == :hot
@@ -55,11 +55,11 @@ end
 
 
 """
-	random_XYVector(rng::MersenneTwister)
+	random_XYVector(rng::AbstractRNG)
 
 Generates a random unit vector represented by `NTuple{2, Float64}`.
 """
-function random_XYVector(rng::MersenneTwister)
+function random_XYVector(rng::AbstractRNG)
 	θ = rand(rng) * 2π
 	return (cos(θ), sin(θ))
 end

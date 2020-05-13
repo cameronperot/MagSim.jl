@@ -47,7 +47,7 @@ Attributes
 * `σ`          : Lattice containing the spins, values are ±1
 * `params`     : Parameters type, contains relevant parameters for the simulation
 * `observables`: Observables type, contains relevant observables data for the simulation
-* `rng`        : MersenneTwister type random number generator
+* `rng`        : Random number generator
 
 # Examples
 ```julia-repl
@@ -65,7 +65,7 @@ struct Ising <: AbstractMagnetismModel
 	σ          ::Array{Int8, 2}
 	params     ::Parameters
 	observables::Observables
-	rng        ::MersenneTwister
+	rng        ::AbstractRNG
 
 	function Ising(
 		L         ::Int,
@@ -118,7 +118,7 @@ Attributes
 * `σ`          : Lattice containing the spins, values are ∈ {1, ..., q}
 * `params`     : Parameters type, contains relevant parameters for the simulation
 * `observables`: Observables type, contains relevant observables data for the simulation
-* `rng`        : MersenneTwister type random number generator
+* `rng`        : Random number generator
 
 # Examples
 ```julia-repl
@@ -136,7 +136,7 @@ struct Potts <: AbstractMagnetismModel
 	σ          ::Array{Int8, 2}
 	params     ::Parameters
 	observables::Observables
-	rng        ::MersenneTwister
+	rng        ::AbstractRNG
 
 	function Potts(
 		q         ::Int,
@@ -188,7 +188,7 @@ Attributes
 * `σ`          : Lattice containing the spins, values are 2D unit vectors
 * `params`     : Parameters type, contains relevant parameters for the simulation
 * `observables`: Observables type, contains relevant observables data for the simulation
-* `rng`        : MersenneTwister type random number generator
+* `rng`        : Random number generator
 
 # Examples
 ```julia-repl
@@ -206,7 +206,7 @@ struct XY <: AbstractMagnetismModel
 	σ          ::Array{NTuple{2, Float64}, 2}
 	params     ::Parameters
 	observables::Observables
-	rng        ::MersenneTwister
+	rng        ::AbstractRNG
 
 	function XY(
 		L         ::Int,

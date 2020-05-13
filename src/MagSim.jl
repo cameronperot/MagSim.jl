@@ -2,8 +2,8 @@ module MagSim
 
 using CSV
 using DataFrames
-using Random: MersenneTwister, rand
-using Statistics: mean, var
+using Random
+using Statistics
 
 import Base: show
 
