@@ -2,6 +2,9 @@
 	metropolis!(model::Ising)
 
 Implementation of the Metropolis algorithm for the Ising model.
+
+Arguments
+* `model`: Ising type
 """
 function metropolis!(model::Ising)
 	t₀ = floor(Int, model.params.cutoff * model.params.n_sweeps)
@@ -26,6 +29,9 @@ end
 	metropolis!(model::Potts)
 
 Implementation of the Metropolis algorithm for the Potts model.
+
+Arguments
+* `model`: Potts type
 """
 function metropolis!(model::Potts)
 	t₀ = floor(Int, model.params.cutoff * model.params.n_sweeps)
@@ -53,6 +59,9 @@ end
 	metropolis!(model::XY)
 
 Implementation of the Metropolis algorithm for the XY model.
+
+Arguments
+* `model`: XY type
 """
 function metropolis!(model::XY)
 	t₀ = floor(Int, model.params.cutoff * model.params.n_sweeps)
@@ -78,6 +87,9 @@ end
 	heat_bath!(model::Ising)
 
 Implementation of the heat bath algorithm for the Ising model.
+
+Arguments
+* `model`: Ising type
 """
 function heat_bath!(model::Ising)
 	t₀ = floor(Int, model.params.cutoff * model.params.n_sweeps)
@@ -102,6 +114,9 @@ end
 	heat_bath!(model::Potts)
 
 Implementation of the heat bath algorithm for the Potts model.
+
+Arguments
+* `model`: Potts type
 """
 function heat_bath!(model::Potts)
 	t₀ = floor(Int, model.params.cutoff * model.params.n_sweeps)
@@ -131,6 +146,9 @@ end
 	heat_bath!(model::XY)
 
 Implementation of the heat bath algorithm for the XY model.
+
+Arguments
+* `model`: XY type
 """
 function heat_bath!(model::XY)
 	t₀ = floor(Int, model.params.cutoff * model.params.n_sweeps)

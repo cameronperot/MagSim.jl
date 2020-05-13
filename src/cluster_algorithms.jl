@@ -2,6 +2,10 @@
 	wolff!(model::Ising, avg_cluster_size::Int)
 
 Implementation of the Wolff single cluster algorithm for the Ising model.
+
+Arguments
+* `model`           : Ising type
+* `avg_cluster_size`: Average cluster size
 """
 function wolff!(model::Ising, avg_cluster_size::Int)
 	P          = 1 - exp(-2 * model.params.β)
@@ -42,6 +46,9 @@ end
 	wolff!(model::Potts, avg_cluster_size::Int)
 
 Implementation of the Wolff single cluster algorithm for the Potts model.
+Arguments
+* `model`           : Potts type
+* `avg_cluster_size`: Average cluster size
 """
 function wolff!(model::Potts, avg_cluster_size::Int)
 	P          = 1 - exp(-model.params.β)
@@ -82,6 +89,10 @@ end
 	wolff!(model::XY, avg_cluster_size::Int)
 
 Implementation of the Wolff single cluster algorithm for the XY model.
+
+Arguments
+* `model`           : XY type
+* `avg_cluster_size`: Average cluster size
 """
 function wolff!(model::XY, avg_cluster_size::Int)
 	P          = 1 - exp(-2 * model.params.β)
@@ -129,6 +140,10 @@ end
 """
 	swendsen_wang!(model::Ising)
 
+Implementation of the Swendsen-Wang multiple cluster algorithm for the Ising model.
+
+Arguments
+* `model`: Ising type
 """
 function swendsen_wang!(model::Ising)
 	P          = 1 - exp(-2 * model.params.β)

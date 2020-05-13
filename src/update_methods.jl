@@ -2,6 +2,11 @@
 	compute_E_M_Ising(σ::Array{Int8, 2})
 
 Computes the Ising model internal energy and magnetization for the input spin configuration `σ`.
+
+Arguments
+* `σ`     : A 2D array representing a square lattice in the Ising model
+Returns
+* `(E, M)`: The system's energy and magnetization
 """
 function compute_E_M_Ising(σ::Array{Int8, 2})
 	E::Int = 0
@@ -20,6 +25,11 @@ end
 	compute_E_Potts(σ::Array{Int8, 2})
 
 Computes the Potts model internal energy for the input spin configuration `σ`.
+
+Arguments
+* `σ` : A 2D array representing a square lattice in the Potts model
+Returns
+* `E` : The system's energy
 """
 function compute_E_Potts(σ::Array{Int8, 2})
 	E::Int = 0
@@ -36,6 +46,11 @@ end
 	compute_E_M_XY(σ::Array{NTuple{2, Float64}, 2})
 
 Computes the XY model internal energy and magnetization for the input spin configuration `σ`.
+
+Arguments
+* `σ`          : A 2D array representing a square lattice in the Ising model
+Returns
+* `(E, Mx, My)`: The system's energy, x-magnetization, and y-magnetization
 """
 function compute_E_M_XY(σ::Array{NTuple{2, Float64}, 2})
 	E  = 0.
@@ -56,6 +71,9 @@ end
 	update_observables!(model::Ising)
 
 Pushes the current energy and magnetization to their respective arrays.
+
+Arguments
+* `model`: Ising type
 """
 function update_observables!(model::Ising)
 	E, M = compute_E_M_Ising(model.σ)
@@ -68,6 +86,9 @@ end
 	update_observables!(model::Potts)
 
 Pushes the current energy and magnetization to their respective arrays.
+
+Arguments
+* `model`: Potts type
 """
 function update_observables!(model::Potts)
 	E = compute_E_Potts(model.σ)
@@ -79,6 +100,9 @@ end
 	update_observables!(model::XY)
 
 Pushes the current energy and magnetization to their respective arrays.
+
+Arguments
+* `model`: XY type
 """
 function update_observables!(model::XY)
 	E, Mx, My = compute_E_M_XY(model.σ)

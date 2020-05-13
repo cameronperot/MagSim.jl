@@ -10,6 +10,19 @@
 		)
 
 Runs multiple Ising simulations in parallel.
+
+Arguments
+* `algorithm`  : The algorithm with which to run the simulation
+* `Ls`         : The side lengths for which to run the simulations with
+* `βs`         : The inverse temperatures for which to run the simulations with
+* `n_sweeps`   : The number of update sweeps for each simulation
+* `cutoff`     : How much of the initial data to throw away (i.e. to ignore the observations
+	when the system was thermalizing
+* `start_type` : Whether or not to start the simulation with a cold or hot start, available
+	options are `[:cold, :hot]`
+* `seed`       : Random number generator seed value
+Returns
+* A dictionary with all of the simulations, where the keys are the specific `(L, β)` values
 """
 function simulate_Ising_parallel(
 	algorithm ::Function,

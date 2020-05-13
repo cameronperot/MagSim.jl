@@ -2,6 +2,12 @@
 	compute_bin_averages(O::Array{Float64, 1}, n::Int)
 
 Computes the bin averages, used in computing the autocorrelation time.
+
+Arguments
+* `O`       : Array representing an observable, e.g. E or M
+* `n`       : Number of observations per bin
+Returns
+* `bin_avgs`: Bin averages
 """
 function compute_bin_averages(O::Array{Float64, 1}, n::Int)
 	N = length(O)
@@ -24,6 +30,12 @@ end
 Computes the integrated autocorrelation time using the binning method. The autocorrelation
 time is the value at which the output sequence (either energy `:e` or magnetization `:m` in
 the return dictionary) asymptotes at.
+
+Arguments
+* `model`: A Potts or Ising type model
+* `ns`   : Array of bin sizes
+Returns
+* Dictionary with keys `[:e, :m]` with bin method values to be plotted against `ns`
 """
 function compute_autocorrelation_time(model::Union{Ising, Potts}, ns::Array{Int, 1})
 	V       = length(model.σ)
@@ -55,6 +67,12 @@ end
 Computes the integrated autocorrelation time using the binning method. The autocorrelation
 time is the value at which the output sequence (either energy `:e` or magnetization `:m` in
 the return dictionary) asymptotes at.
+
+Arguments
+* `model`: An XY type model
+* `ns`   : Array of bin sizes
+Returns
+* Dictionary with keys `[:e, :mx, my]` with bin method values to be plotted against `ns`
 """
 function compute_autocorrelation_time(model::XY, ns::Array{Int, 1})
 	V        = length(model.σ)
@@ -90,6 +108,11 @@ end
 	sim_dict_to_df(sims::Dict)
 
 Converts a dictionary where the values are models into a DataFrame object.
+
+Arguments
+* `sims`: Dictionary where the values are simulations
+Returns
+* `df`  : DataFrame containing the simulation data
 """
 function sim_dict_to_df(sims::Dict)
 	df = DataFrame(L=Int[], β=Float64[],
