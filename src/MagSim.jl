@@ -28,6 +28,7 @@ heat_bath!,
 
 # parallel_simulation_methods
 simulate_Ising_parallel,
+simulate_Potts_parallel,
 
 # plotting_methods
 plot_energy,

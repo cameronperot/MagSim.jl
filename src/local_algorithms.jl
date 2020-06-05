@@ -22,6 +22,7 @@ function metropolis!(model::Ising)
 	end
 
 	compute_observables_statistics!(model)
+	return model
 end
 
 
@@ -52,6 +53,7 @@ function metropolis!(model::Potts)
 	end
 
 	compute_observables_statistics!(model)
+	return model
 end
 
 
@@ -80,6 +82,7 @@ function metropolis!(model::XY)
 	end
 
 	compute_observables_statistics!(model)
+	return model
 end
 
 
@@ -107,6 +110,7 @@ function heat_bath!(model::Ising)
 	end
 
 	compute_observables_statistics!(model)
+	return model
 end
 
 
@@ -139,6 +143,7 @@ function heat_bath!(model::Potts)
 	end
 
 	compute_observables_statistics!(model)
+	return model
 end
 
 
@@ -167,4 +172,5 @@ function heat_bath!(model::XY)
 	end
 
 	compute_observables_statistics!(model)
+	return model
 end
