@@ -114,21 +114,32 @@ Arguments
 Returns
 * `df`  : DataFrame containing the simulation data
 """
-function sim_dict_to_df(sims::Dict)
-	df = DataFrame(L=Int[], β=Float64[],
-		e=Float64[], c=Float64[],
-		m=Float64[], χ=Float64[],
-		U=Float64[],
-		)
-
-	for sim in values(sims)
-		push!(df,
-			[sim.params.L, sim.params.β,
-			sim.observables.statistics[:e], sim.observables.statistics[:c],
-			sim.observables.statistics[:m], sim.observables.statistics[:χ],
-			sim.observables.statistics[:U]]
+function sim_dict_to_df(sims::Dict; include_magnetization::Bool=true)
+	if include_magnetization
+		df = DataFrame(L=Int[], β=Float64[], e=Float64[], c=Float64[],
+			m=Float64[], χ=Float64[], U=Float64[]
 			)
+
+		for sim in values(sims)
+			push!(df,
+				[sim.params.L, sim.params.β,
+				sim.observables.statistics[:e], sim.observables.statistics[:c],
+				sim.observables.statistics[:m], sim.observables.statistics[:χ],
+				sim.observables.statistics[:U]]
+				)
+		end
+	else
+		df = DataFrame(L=Int[], β=Float64[], e=Float64[], c=Float64[])
+
+		for sim in values(sims)
+			push!(df,
+				[sim.params.L, sim.params.β,
+				sim.observables.statistics[:e], sim.observables.statistics[:c]]
+				)
+		end
 	end
+
+
 	sort!(df, [:L, :β])
 
 	return df
