@@ -9,33 +9,33 @@ import Base: show
 
 export
 
-# AbstractModels
-MagnetismModels,
-Ising,
-Potts,
-XY,
+    # AbstractModels
+    MagnetismModels,
+    Ising,
+    Potts,
+    XY,
 
-# analysis_methods
-sim_dict_to_df,
+    # analysis_methods
+    sim_dict_to_df,
 
-# cluster_algorithms
-wolff!,
-swendsen_wang!,
+    # cluster_algorithms
+    wolff!,
+    swendsen_wang!,
 
-# local_algorithms
-metropolis!,
-heat_bath!,
+    # local_algorithms
+    metropolis!,
+    heat_bath!,
 
-# parallel_simulation_methods
-simulate_Ising_parallel,
-simulate_Potts_parallel,
+    # parallel_simulation_methods
+    simulate_Ising_parallel,
+    simulate_Potts_parallel,
 
-# plotting_methods
-plot_energy,
-plot_heat_capacity,
-plot_magnetization,
-plot_susceptibility,
-plot_Ising_lattice
+    # plotting_methods
+    plot_energy,
+    plot_heat_capacity,
+    plot_magnetization,
+    plot_susceptibility,
+    plot_Ising_lattice
 
 # includes
 include("./Observables.jl")

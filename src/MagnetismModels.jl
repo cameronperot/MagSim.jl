@@ -1,5 +1,5 @@
 """
-	AbstractMagnetismModel
+    AbstractMagnetismModel
 
 Abstract type for various magnetism models.
 
@@ -12,20 +12,20 @@ abstract type AbstractMagnetismModel end
 
 
 function show(io::IO, model::AbstractMagnetismModel)
-	println(typeof(model))
-	show(model.params)
+    println(typeof(model))
+    show(model.params)
 end
 
 
 """
-	Ising(
-		L         ::Int,
-		β         ::Real;
-		n_sweeps  ::Int    =10^5,
-		cutoff    ::Float64=0.2,
-		start_type::Symbol =:cold,
-		seed      ::Int    =8,
-		)
+    Ising(
+        L         ::Int,
+        β         ::Real;
+        n_sweeps  ::Int    =10^5,
+        cutoff    ::Float64=0.2,
+        start_type::Symbol =:cold,
+        seed      ::Int    =8,
+        )
 
 Type representing a 2D Ising model.
 
@@ -36,7 +36,7 @@ Arguments
 Keyword Arguments
 * `n_sweeps`  : The number of update sweeps to run over the lattice
 * `cutoff`    : The percentage of measurements to throw away, i.e. throw away values during
-	thermalization
+    thermalization
 * `start_type`: `:cold` starts the lattice with all spins aligned, `:hot` all spins random
 * `seed`      : Seed value for the random number generator
 
@@ -62,40 +62,40 @@ q          = 0
 ```
 """
 struct Ising <: AbstractMagnetismModel
-	σ          ::Array{Int8, 2}
-	params     ::Parameters
-	observables::Observables
-	rng        ::AbstractRNG
+    σ::Array{Int8,2}
+    params::Parameters
+    observables::Observables
+    rng::AbstractRNG
 
-	function Ising(
-		L         ::Int,
-		β         ::Real;
-		n_sweeps  ::Int    =10^5,
-		cutoff    ::Float64=0.2,
-		start_type::Symbol =:cold,
-		seed      ::Int    =8,
-		)
+    function Ising(
+        L::Int,
+        β::Real;
+        n_sweeps::Int = 10^5,
+        cutoff::Float64 = 0.2,
+        start_type::Symbol = :cold,
+        seed::Int = 8,
+    )
 
-		params                = Parameters(L, β, n_sweeps, cutoff, start_type, seed, 0)
-		rng                   = MersenneTwister(params.seed)
-		σ                     = initialize_σ_Ising(params.L, params.start_type, rng)
-		observables           = Observables(Int)
+        params = Parameters(L, β, n_sweeps, cutoff, start_type, seed, 0)
+        rng = MersenneTwister(params.seed)
+        σ = initialize_σ_Ising(params.L, params.start_type, rng)
+        observables = Observables(Int)
 
-		return new(σ, params, observables, rng)
-	end
+        return new(σ, params, observables, rng)
+    end
 end
 
 
 """
-	Potts(
-		q         ::Int,
-		L         ::Int,
-		β         ::Real;
-		n_sweeps  ::Int    =10^5,
-		cutoff    ::Float64=0.2,
-		start_type::Symbol =:cold,
-		seed      ::Int    =8,
-		)
+    Potts(
+        q         ::Int,
+        L         ::Int,
+        β         ::Real;
+        n_sweeps  ::Int    =10^5,
+        cutoff    ::Float64=0.2,
+        start_type::Symbol =:cold,
+        seed      ::Int    =8,
+        )
 
 Type representing a 2D Potts q-state model.
 
@@ -107,7 +107,7 @@ Arguments
 Keyword Arguments
 * `n_sweeps`  : The number of update sweeps to run over the lattice
 * `cutoff`    : The percentage of measurements to throw away, i.e. throw away values during
-	thermalization
+    thermalization
 * `start_type`: `:cold` starts the lattice with all spins aligned, `:hot` all spins random
 * `seed`      : Seed value for the random number generator
 
@@ -133,40 +133,40 @@ q          = 8
 ```
 """
 struct Potts <: AbstractMagnetismModel
-	σ          ::Array{Int8, 2}
-	params     ::Parameters
-	observables::Observables
-	rng        ::AbstractRNG
+    σ::Array{Int8,2}
+    params::Parameters
+    observables::Observables
+    rng::AbstractRNG
 
-	function Potts(
-		q         ::Int,
-		L         ::Int,
-		β         ::Real;
-		n_sweeps  ::Int    =10^5,
-		cutoff    ::Float64=0.2,
-		start_type::Symbol =:cold,
-		seed      ::Int    =8,
-		)
+    function Potts(
+        q::Int,
+        L::Int,
+        β::Real;
+        n_sweeps::Int = 10^5,
+        cutoff::Float64 = 0.2,
+        start_type::Symbol = :cold,
+        seed::Int = 8,
+    )
 
-		params                = Parameters(L, β, n_sweeps, cutoff, start_type, seed, q)
-		rng                   = MersenneTwister(seed)
-		σ                     = initialize_σ_Potts(q, L, start_type, rng)
-		observables           = Observables(Int)
+        params = Parameters(L, β, n_sweeps, cutoff, start_type, seed, q)
+        rng = MersenneTwister(seed)
+        σ = initialize_σ_Potts(q, L, start_type, rng)
+        observables = Observables(Int)
 
-		return new(σ, params, observables, rng)
-	end
+        return new(σ, params, observables, rng)
+    end
 end
 
 
 """
-	XY(
-		L         ::Int,
-		β         ::Real;
-		n_sweeps  ::Int    =10^5,
-		cutoff    ::Float64=0.2,
-		start_type::Symbol =:cold,
-		seed      ::Int    =8,
-		)
+    XY(
+        L         ::Int,
+        β         ::Real;
+        n_sweeps  ::Int    =10^5,
+        cutoff    ::Float64=0.2,
+        start_type::Symbol =:cold,
+        seed      ::Int    =8,
+        )
 
 Type representing an XY model.
 
@@ -177,7 +177,7 @@ Arguments
 Keyword Arguments
 * `n_sweeps`  : The number of update sweeps to run over the lattice
 * `cutoff`    : The percentage of measurements to throw away, i.e. throw away values during
-	thermalization
+    thermalization
 * `start_type`: `:cold` starts the lattice with all spins aligned, `:hot` all spins random
 * `seed`      : Seed value for the random number generator
 
@@ -203,25 +203,25 @@ q          = 0
 ```
 """
 struct XY <: AbstractMagnetismModel
-	σ          ::Array{NTuple{2, Float64}, 2}
-	params     ::Parameters
-	observables::Observables
-	rng        ::AbstractRNG
+    σ::Array{NTuple{2,Float64},2}
+    params::Parameters
+    observables::Observables
+    rng::AbstractRNG
 
-	function XY(
-		L         ::Int,
-		β         ::Real;
-		n_sweeps  ::Int    =10^5,
-		cutoff    ::Float64=0.2,
-		start_type::Symbol =:cold,
-		seed      ::Int    =8,
-		)
+    function XY(
+        L::Int,
+        β::Real;
+        n_sweeps::Int = 10^5,
+        cutoff::Float64 = 0.2,
+        start_type::Symbol = :cold,
+        seed::Int = 8,
+    )
 
-		params      = Parameters(L, β, n_sweeps, cutoff, start_type, seed, 0)
-		rng         = MersenneTwister(seed)
-		σ           = initialize_σ_XY(L, start_type, rng)
-		observables = Observables(Float64)
+        params = Parameters(L, β, n_sweeps, cutoff, start_type, seed, 0)
+        rng = MersenneTwister(seed)
+        σ = initialize_σ_XY(L, start_type, rng)
+        observables = Observables(Float64)
 
-		return new(σ, params, observables, rng)
-	end
+        return new(σ, params, observables, rng)
+    end
 end
